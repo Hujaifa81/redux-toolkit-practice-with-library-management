@@ -4,27 +4,47 @@ import { Columns } from "./Columns"
 import { DataTable } from "./DataTable"
 import { toast } from "sonner"
 import type { IBook } from "@/interfaces/books/books"
+import type { IBorrowBookObj } from "@/interfaces/borrowBooks/borrowBooks"
+import { useAddBorrowBookMutation } from "@/redux/api/borrowBooks/borrowBooksApi"
 
 
 const AllBooks = () => {
-  const { data, isLoading, isError } = useGetAllBooksQuery({})
+  const { data, isLoading, isError, refetch: refetchBooks } = useGetAllBooksQuery({})
   const [deleteBook] = useDeleteBookMutation()
-  const [updateBook]=useUpdateBookMutation()
+  const [updateBook] = useUpdateBookMutation()
+  const [borrowBook] = useAddBorrowBookMutation()
 
-  const handleDelete=async (id:string)=>{
+  const handleDelete = async (id: string) => {
     await deleteBook(id)
-     toast.success("Book deleted successfully")
+    toast.success("Book deleted successfully")
   }
-  const handleEdit=async(book:Omit<IBook,"description" | "createdAt" | "updatedAt">)=>{
+  const handleEdit = async (book: Omit<IBook, "description" | "createdAt" | "updatedAt">) => {
     await updateBook(book)
     toast.success("Book updated successfully")
   }
-  const columns=Columns(
+  const handleBorrow = async (book: IBorrowBookObj) => {
+    try {
+      const res = await borrowBook(book).unwrap(); 
+      refetchBooks();
+      console.log(res);  
+      toast.success("Book borrowed successfully");
+    } catch (error: unknown) {
+      if (error && (error as { data?: { message?: string } }).data?.message) {
+        toast.error("Failed to borrow book: " + (error as { data: { message: string } }).data.message);
+      } else {
+     
+        toast.error("Failed to borrow book");
+      }
+    }
+  };
+
+
+  const columns = Columns(
     handleEdit,
     handleDelete,
-    (book) => console.log("Borrow", book)
+    handleBorrow
   )
- 
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20 text-muted-foreground">

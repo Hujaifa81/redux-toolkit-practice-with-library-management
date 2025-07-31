@@ -1,4 +1,4 @@
-import type { IBorrowBook, IBorrowBookResponse } from "@/interfaces/borrowBooks/borrowBooks";
+import type {  IBorrowBookObj, IBorrowBookResponse } from "@/interfaces/borrowBooks/borrowBooks";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const borrowBooksApi = createApi({
@@ -12,7 +12,7 @@ export const borrowBooksApi = createApi({
       }),
       providesTags: ['borrow'],
     }),
-    addBorrowBook: builder.mutation<IBorrowBookResponse, Omit<IBorrowBook, 'createdAt' | 'updatedAt' | '_id'>>({
+    addBorrowBook: builder.mutation<IBorrowBookResponse, IBorrowBookObj>({
       query: (newBorrowBook) => ({
         url: 'api/borrow',
         method: 'POST',
@@ -24,4 +24,4 @@ export const borrowBooksApi = createApi({
   }),
 })
 
-export const { useAddBorrowBookMutation } = borrowBooksApi;
+export const { useAddBorrowBookMutation,useGetBorrowBooksSummaryQuery } = borrowBooksApi;

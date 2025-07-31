@@ -1,4 +1,3 @@
-// components/books/Columns.tsx
 import type { IBook } from "@/interfaces/books/books"
 import type { ColumnDef } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
@@ -11,12 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 import DeleteAlert from "./DeleteAlert"
 import EditModal from "./EditModal"
+import BorrowModal from "./BorrowModal"
+import type { IBorrowBookObj } from "@/interfaces/borrowBooks/borrowBooks"
 
 
 export const Columns = (
   onEdit: (book: Omit<IBook, "description" | "createdAt" | "updatedAt">) => void,
   onDelete: (_id: string) => void,
-  onBorrow: (book: IBook) => void
+  onBorrow: (book:IBorrowBookObj) => void
 ): ColumnDef<IBook>[] => [
   {
     accessorKey: "title",
@@ -63,8 +64,8 @@ export const Columns = (
             <DropdownMenuItem asChild>
               <DeleteAlert onConfirm={() => onDelete(book._id)} bookTitle={book.title} />
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onBorrow(book)} className="text-blue-600">
-              Borrow
+            <DropdownMenuItem asChild>
+              <BorrowModal book={book} onConfirm={(b) => onBorrow(b)} />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

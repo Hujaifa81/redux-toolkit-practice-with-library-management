@@ -23,3 +23,9 @@ export interface IBorrowBookSummaryResponse{
     message: string;
     success: boolean;
 }
+
+export interface IBorrowBookObj{
+    book:string,
+    quantity:number,
+    dueDate:Date,
+}
