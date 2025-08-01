@@ -24,9 +24,9 @@ const AllBooks = () => {
   }
   const handleBorrow = async (book: IBorrowBookObj) => {
     try {
-      const res = await borrowBook(book).unwrap(); 
+       await borrowBook(book).unwrap(); 
       refetchBooks();
-      console.log(res);  
+        
       toast.success("Book borrowed successfully");
     } catch (error: unknown) {
       if (error && (error as { data?: { message?: string } }).data?.message) {

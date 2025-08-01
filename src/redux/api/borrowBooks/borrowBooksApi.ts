@@ -1,4 +1,4 @@
-import type {  IBorrowBookObj, IBorrowBookResponse } from "@/interfaces/borrowBooks/borrowBooks";
+import type {  IBorrowBookObj, IBorrowBookResponse, IBorrowBookSummaryResponse } from "@/interfaces/borrowBooks/borrowBooks";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const borrowBooksApi = createApi({
@@ -6,7 +6,7 @@ export const borrowBooksApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: 'https://library-management-system-neon-iota.vercel.app/' }),
   tagTypes: ['borrow', 'books'],
   endpoints: (builder) => ({
-    getBorrowBooksSummary: builder.query<IBorrowBookResponse, void>({
+    getBorrowBooksSummary: builder.query<IBorrowBookSummaryResponse, void>({
       query: () => ({
         url: 'api/borrow',
       }),

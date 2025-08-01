@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import type { IBook } from "@/interfaces/books/books"
-import { CalendarIcon, Share } from "lucide-react"
+import { BookOpen, CalendarIcon } from "lucide-react"
 import {
     Popover,
     PopoverContent,
@@ -67,7 +67,7 @@ const BorrowModal = ({ book, onConfirm }: IBorrowModalProps) => {
             <Dialog>
                 <DialogTrigger asChild>
                     <Button variant="ghost" size="sm" className="text-black w-full justify-start">
-                        <Share /> Borrow
+                        <BookOpen /> Borrow
                     </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
