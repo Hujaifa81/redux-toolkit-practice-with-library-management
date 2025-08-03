@@ -3,7 +3,7 @@
 **[Live Link](https://library-management-eight-coral.vercel.app/)**
   
 ## Project Overview
-Develop a minimal library management system using React, Redux Toolkit and TypeScript. The system will allow users to view a list of books, perform CRUD operations, borrow books, and view a simple borrow summary—all without authentication, category filters, or payment integration.
+Developed a minimal library management system using React, Redux Toolkit and TypeScript. The system will allow users to view a list of books, perform CRUD operations, borrow books, and view a simple borrow summary—all without authentication, category filters, or payment integration.
 
 The main goal is to build a functional and clean client-side application that interacts with a RESTful API, demonstrating proper state management, UI design, and core functionality.
 
