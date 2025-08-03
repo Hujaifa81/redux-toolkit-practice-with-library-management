@@ -3,12 +3,13 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import {  z } from "zod"
+import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import type { IBook } from "@/interfaces/books/books"
-import {  Plus } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 
 const formSchema = z.object({
@@ -17,10 +18,10 @@ const formSchema = z.object({
     genre: z.string().min(1, "Genre is required").refine((val) => ["FICTION", "NON_FICTION", "HISTORY", "BIOGRAPHY", "FANTASY"].includes(val), {
         message: "Invalid genre",
     }),
-   description: z
-    .string()
-    .min(1, "Description is required")
-    .min(10, "Description must be at least 10 characters long"),
+    description: z
+        .string()
+        .min(1, "Description is required")
+        .min(10, "Description must be at least 10 characters long"),
     isbn: z.string().min(1, "ISBN is required"),
     copies: z.number().min(1, "Copies must be at least 1"),
     available: z.boolean(),
@@ -30,45 +31,49 @@ type FormInput = z.infer<typeof formSchema>
 
 
 interface ICreateModalProps {
-    handleCreateBook: (b:Omit<IBook,'_id'|'createdAt' | 'updatedAt'> ) => void;
+    handleCreateBook: (b: Omit<IBook, '_id' | 'createdAt' | 'updatedAt'>) => void;
 }
 
-const CreateBookModal = ({handleCreateBook}:ICreateModalProps) => {
-    const [open,setOpen]=useState(false)
+const CreateBookModal = ({ handleCreateBook }: ICreateModalProps) => {
+    const [open, setOpen] = useState(false)
+    const navigate = useNavigate()
     const form = useForm<FormInput>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             title: '',
             author: '',
             genre: '',
-            isbn:'',
-            copies:1,
+            isbn: '',
+            copies: 1,
             available: true,
-            description:''
+            description: ''
         },
     })
 
     const onSubmit = (values: FormInput) => {
 
-        const book:Omit<IBook,'_id'|'createdAt' | 'updatedAt'> = {
+        const book: Omit<IBook, '_id' | 'createdAt' | 'updatedAt'> = {
             ...values,
             genre: values.genre as IBook["genre"],
-           
+
         }
         handleCreateBook(book)
         setOpen(false)
-        
+        navigate('/')
     }
 
     return (
         <div>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="text-black w-full justify-start">
-                        <Plus /> Add Book
-                    </Button>
+                    <div className="flex justify-center items-center w-full mt-20">
+                        <Button size="lg" className="text-black  justify-center items-center bg-blue-400 hover:bg-blue-700 hover:cursor-pointer ">
+                            <Plus /> Add Book
+                        </Button>
+                    </div>
+
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Add Book</DialogTitle>
                         <DialogDescription>
@@ -162,10 +167,10 @@ const CreateBookModal = ({handleCreateBook}:ICreateModalProps) => {
                                             <Input
                                                 placeholder="Number of Copies"
                                                 type="number"
-                                                value={field.value} 
+                                                value={field.value}
                                                 onChange={(e) => {
-                                                    const value = e.target.value ? Number(e.target.value):0;
-                                                    field.onChange(value); 
+                                                    const value = e.target.value ? Number(e.target.value) : 0;
+                                                    field.onChange(value);
                                                 }}
                                             />
                                         </FormControl>
@@ -174,7 +179,7 @@ const CreateBookModal = ({handleCreateBook}:ICreateModalProps) => {
                                 )}
                             />
 
-                            
+
                             {/* description */}
                             <FormField
                                 control={form.control}
@@ -194,7 +199,7 @@ const CreateBookModal = ({handleCreateBook}:ICreateModalProps) => {
                                 <DialogClose asChild>
                                     <Button variant="outline">Cancel</Button>
                                 </DialogClose>
-                                <Button type="submit">Create</Button>
+                                <Button type="submit">Add</Button>
                             </DialogFooter>
                         </form>
                     </Form>

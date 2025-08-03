@@ -1,16 +1,18 @@
-
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import type { IBook, updatedBookObj } from "@/interfaces/books/books"
-import { PenIcon } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useGetBookByIdQuery, useUpdateBookMutation } from "@/redux/api/books/booksApi"
+import { useNavigate, useParams } from "react-router-dom"
+import type {  updatedBookObj } from "@/interfaces/books/books"
+import { useEffect } from "react"
+import { toast } from "sonner"
 
-
+// Form schema for validation using zod
 const formSchema = z.object({
     title: z.string().min(1, "Title is required"),
     author: z.string().min(1, "Author is required"),
@@ -24,44 +26,63 @@ const formSchema = z.object({
 
 type FormInput = z.infer<typeof formSchema>
 
+const EditModal = () => {
+    const { id } = useParams<{ id: string }>()
+    const { data, isLoading, isError } = useGetBookByIdQuery(id as string)
+    const [updateBook] = useUpdateBookMutation()
+    const navigate=useNavigate()
 
-interface IEditModalProps {
-    book: IBook;
-    onConfirm: (b: updatedBookObj) => void;
-}
-
-const EditModal = ({ book, onConfirm }: IEditModalProps) => {
+    // Initialize useForm hook unconditionally
     const form = useForm<FormInput>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            title: book.title,
-            author: book.author,
-            genre: book.genre,
-            isbn: book.isbn,
-            copies: book.copies,
-            available: book.available,
+            title: "",
+            author: "",
+            genre: "",
+            isbn: "",
+            copies: 0,
+            available: false,
         },
     })
 
-    const onSubmit = (values: FormInput) => {
+    useEffect(() => {
+        if (data?.data) {
+            form.reset({
+                title: data.data.title,
+                author: data.data.author,
+                genre: data.data.genre,
+                isbn: data.data.isbn,
+                copies: data.data.copies,
+                available: data.data.available,
+            })
+        }
+    }, [data?.data, form])
 
+    if (isLoading) {
+        return <div>Loading...</div> 
+    }
+
+    if (isError || !data?.data) {
+        return <div>Error: Unable to load book data</div> 
+    }
+
+    const onSubmit =async (values: FormInput) => {
         const updatedBook: updatedBookObj = {
             ...values,
             genre: values.genre as updatedBookObj["genre"],
-            _id: book._id,
+            _id: data.data._id,
         }
-        onConfirm(updatedBook)
+        await updateBook(updatedBook)
+        toast.success("Book updated successfully")
+        navigate(-1)
+        
+
     }
 
     return (
         <div>
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="text-black w-full justify-start">
-                        <PenIcon /> Edit
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
+            <Dialog open={true} onOpenChange={() => navigate(-1)}>
+                <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Edit Book</DialogTitle>
                         <DialogDescription>
@@ -108,10 +129,7 @@ const EditModal = ({ book, onConfirm }: IEditModalProps) => {
                                     <FormItem>
                                         <FormLabel>Genre</FormLabel>
                                         <FormControl>
-                                            <Select
-                                                value={field.value}
-                                                onValueChange={(value) => field.onChange(value)}
-                                            >
+                                            <Select value={field.value} onValueChange={(value) => field.onChange(value)}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select Genre" />
                                                 </SelectTrigger>
@@ -155,10 +173,10 @@ const EditModal = ({ book, onConfirm }: IEditModalProps) => {
                                             <Input
                                                 placeholder="Number of Copies"
                                                 type="number"
-                                                value={field.value} 
+                                                value={field.value}
                                                 onChange={(e) => {
-                                                    const value = e.target.value ? Number(e.target.value) : "";
-                                                    field.onChange(value); 
+                                                    const value = e.target.value ? Number(e.target.value) : ""
+                                                    field.onChange(value)
                                                 }}
                                             />
                                         </FormControl>
@@ -167,8 +185,7 @@ const EditModal = ({ book, onConfirm }: IEditModalProps) => {
                                 )}
                             />
 
-
-                            {/* Available Field - Select for boolean */}
+                            {/* Available Field */}
                             <FormField
                                 control={form.control}
                                 name="available"
@@ -176,11 +193,7 @@ const EditModal = ({ book, onConfirm }: IEditModalProps) => {
                                     <FormItem>
                                         <FormLabel>Available</FormLabel>
                                         <FormControl>
-                                            <Select
-                                                onValueChange={(value) => field.onChange(value === "true")}
-                                                value={field.value ? "true" : "false"}
-                                                disabled
-                                            >
+                                            <Select value={field.value ? "true" : "false"} disabled>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select availability" />
                                                 </SelectTrigger>
@@ -195,11 +208,8 @@ const EditModal = ({ book, onConfirm }: IEditModalProps) => {
                                 )}
                             />
 
-                            <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="outline">Cancel</Button>
-                                </DialogClose>
-                                <Button type="submit">Save changes</Button>
+                            <DialogFooter className="w-[50%] mx-auto" >
+                               <Button type="submit">Save changes</Button>
                             </DialogFooter>
                         </form>
                     </Form>

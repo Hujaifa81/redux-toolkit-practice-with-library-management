@@ -1,13 +1,13 @@
 
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent,  DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import type { IBook } from "@/interfaces/books/books"
-import { BookOpen, CalendarIcon } from "lucide-react"
+
+import { CalendarIcon } from "lucide-react"
 import {
     Popover,
     PopoverContent,
@@ -17,6 +17,11 @@ import { Calendar } from "@/components/ui/calendar"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
 import type { IBorrowBookObj } from "@/interfaces/borrowBooks/borrowBooks"
+import { useNavigate, useParams } from "react-router-dom"
+import { useGetBookByIdQuery } from "@/redux/api/books/booksApi"
+import { useAddBorrowBookMutation } from "@/redux/api/borrowBooks/borrowBooksApi"
+import { useEffect } from "react"
+import { toast } from "sonner"
 
 
 const getFormSchema = (availableCopies: number) =>
@@ -30,53 +35,72 @@ const getFormSchema = (availableCopies: number) =>
             })
             .max(availableCopies, { message: "Not enough copies available." }),
         dueDate: z.date().refine((val) => val !== undefined, {
-                message: "Due date is required",
-            })
+            message: "Due date is required",
+        })
     });
 
 type FormInput = z.infer<ReturnType<typeof getFormSchema>>;
 
 
-interface IBorrowModalProps {
-    book: IBook;
-    onConfirm: (b: IBorrowBookObj) => void
 
-}
 
-const BorrowModal = ({ book, onConfirm }: IBorrowModalProps) => {
-    const schema = getFormSchema(book.copies);
+const BorrowModal = () => {
+    const { id } = useParams<{ id: string }>()
+    const { data, isLoading, isError} = useGetBookByIdQuery(id as string)
+    const [addBorrowBook] = useAddBorrowBookMutation()
+    const navigate = useNavigate()
+    const availableCopies = data?.data.copies ?? 0;
+    const schema = getFormSchema(availableCopies);
     const form = useForm<FormInput>({
         resolver: zodResolver(schema),
         defaultValues: {
-            title: book.title,
+            title: '',
             quantity: 1,
             dueDate: new Date(new Date().setDate(new Date().getDate() + 1)),
-            
+
         },
     })
-    const onSubmit = (values: FormInput) => {
+    useEffect(() => {
+        form.reset({
+            title: data?.data.title,
+            quantity: 1,
+            dueDate: new Date(new Date().setDate(new Date().getDate() + 1)),
+        })
+    }, [data?.data, form])
+    if (isLoading) {
+        return <div>Loading...</div> // Handle loading state
+    }
+
+    if (isError || !data?.data) {
+        return <div>Error: Unable to load book data</div> // Handle error state
+    }
+    const onSubmit = async (values: FormInput) => {
         const borrowBook: IBorrowBookObj = {
-            book: book._id,
+            book: data.data._id,
             quantity: values.quantity,
             dueDate: values.dueDate,
         };
-        onConfirm(borrowBook);
+        try {
+            await addBorrowBook(borrowBook).unwrap();
+            toast.success("Book borrowed successfully");
+            
+        } catch (error: unknown) {
+            if (error && (error as { data?: { message?: string } }).data?.message) {
+                toast.error("Failed to borrow book: " + (error as { data: { message: string } }).data.message);
+            } else {
+
+                toast.error("Failed to borrow book");
+            }
+        }
+
+        navigate('/borrow-summary')
     };
     return (
         <div>
-            <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant="ghost" size="sm" className="text-black w-full justify-start">
-                        <BookOpen /> Borrow
-                    </Button>
-                </DialogTrigger>
+            <Dialog open={true} onOpenChange={() => navigate(-1)}>
+
                 <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Borrow Book</DialogTitle>
-                        <DialogDescription>
-                            Borrow a book by filling out the form below.
-                        </DialogDescription>
-                    </DialogHeader>
+                    
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                             {/* Title Field */}
@@ -161,9 +185,7 @@ const BorrowModal = ({ book, onConfirm }: IBorrowModalProps) => {
                             />
 
                             <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="outline">Cancel</Button>
-                                </DialogClose>
+                               
                                 <Button type="submit">Borrow</Button>
                             </DialogFooter>
                         </form>

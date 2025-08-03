@@ -24,8 +24,8 @@ const Summary = () => {
   
   return (
     <div>
-      <div className="container mx-auto py-6">
-        <h2 className="text-2xl font-bold mb-4">Books Summary</h2>
+      <div className="container mx-auto py-6 w-[80%]">
+        <h2 className="text-2xl font-bold mb-4 text-center">Books Summary</h2>
         <DataTable columns={Columns} data={summary.data} />
       </div>
     </div>

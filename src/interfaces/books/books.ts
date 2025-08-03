@@ -15,5 +15,10 @@ export interface IBookResponse {
     message: string;
     success: boolean;
 }
+export interface IBookResponseSingle {
+    data: IBook;
+    message: string;
+    success: boolean;
+}
 
 export type updatedBookObj = Omit<IBook, "description" | "createdAt" | "updatedAt">

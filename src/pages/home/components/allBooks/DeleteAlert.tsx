@@ -21,8 +21,8 @@ const DeleteAlert = ({ onConfirm, bookTitle }: DeleteAlertProps) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="text-red-600 w-full justify-start">
-          <Trash2 className="h-4 w-4" /> Delete
+        <Button variant="ghost" size="sm" className="text-red-600 w-full justify-start hover:cursor-pointer">
+          <Trash2 className="h-4 w-4" />Delete
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

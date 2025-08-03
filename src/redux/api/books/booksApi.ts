@@ -1,10 +1,10 @@
-import type { IBook, IBookResponse } from '@/interfaces/books/books'
+import type { IBook, IBookResponse, IBookResponseSingle } from '@/interfaces/books/books'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const booksApi = createApi({
   reducerPath: 'booksApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://library-management-system-neon-iota.vercel.app/' }),
-  tagTypes: ['books'],
+  tagTypes: ['books','book'],
   endpoints: (builder) => ({
     getAllBooks: builder.query<IBookResponse, { filter?: string; sortBy?: string; sort?: string; limit?: number }>({
       query: ({ filter, sortBy, sort, limit }) => {
@@ -19,6 +19,10 @@ export const booksApi = createApi({
         }
       },
       providesTags: ['books'],
+    }),
+    getBookById:builder.query<IBookResponseSingle,string>({
+      query:(id)=>`api/books/${id}`,
+      providesTags: ['book'],
     }),
 
     addBook: builder.mutation<IBookResponse, Omit<IBook,'createdAt' | 'updatedAt' | '_id'>>({
@@ -36,7 +40,7 @@ export const booksApi = createApi({
         method: 'PUT',
         body: updatedBook,
       }),
-      invalidatesTags: ['books'],
+      invalidatesTags: ['books','book'],
     }),
 
     deleteBook: builder.mutation<IBookResponse, string>({
@@ -49,4 +53,4 @@ export const booksApi = createApi({
   })
 })
 
-export const { useGetAllBooksQuery, useAddBookMutation, useUpdateBookMutation, useDeleteBookMutation } = booksApi
+export const { useGetAllBooksQuery, useAddBookMutation, useUpdateBookMutation, useDeleteBookMutation,useGetBookByIdQuery } = booksApi

@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const borrowBooksApi = createApi({
   reducerPath: 'borrowBooksApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://library-management-system-neon-iota.vercel.app/' }),
-  tagTypes: ['borrow', 'books'],
+  tagTypes: ['borrow', 'books','book'],
   endpoints: (builder) => ({
     getBorrowBooksSummary: builder.query<IBorrowBookSummaryResponse, void>({
       query: () => ({
@@ -18,7 +18,7 @@ export const borrowBooksApi = createApi({
         method: 'POST',
         body: newBorrowBook,
       }),
-      invalidatesTags: ['borrow', 'books'],
+      invalidatesTags: ['borrow', 'books','book'],
     }),
 
   }),
