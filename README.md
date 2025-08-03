@@ -83,11 +83,11 @@ All pages of this project are accessible without login or authentication. The fo
 ### Clone the Repositories
 - Clone the frontend repository:
   ```bash
-  git clone <https://github.com/Hujaifa81/redux-toolkit-practice-with-library-management>
+  git clone https://github.com/Hujaifa81/redux-toolkit-practice-with-library-management
   ```
 - Clone the backend repository:
   ```bash
-  git clone <https://github.com/Hujaifa81/library-management-api>
+  git clone https://github.com/Hujaifa81/library-management-api
   ```
 
 ---
