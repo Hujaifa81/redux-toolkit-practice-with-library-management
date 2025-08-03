@@ -73,8 +73,8 @@ All pages of this project are accessible without login or authentication. The fo
 ---
 ## Repositories
 
-- **Frontend Repository**: [Frontend Repo Link](<your-frontend-repository-url>)
-- **Backend Repository**: [Backend Repo Link](<your-backend-repository-url>)
+- **Frontend Repository**: [Frontend Repo Link](https://github.com/Hujaifa81/redux-toolkit-practice-with-library-management)
+- **Backend Repository**: [Backend Repo Link](https://github.com/Hujaifa81/library-management-api)
 
 ---
 
@@ -83,11 +83,11 @@ All pages of this project are accessible without login or authentication. The fo
 ### Clone the Repositories
 - Clone the frontend repository:
   ```bash
-  git clone <frontend-repository-url>
+  git clone <https://github.com/Hujaifa81/redux-toolkit-practice-with-library-management>
   ```
 - Clone the backend repository:
   ```bash
-  git clone <backend-repository-url>
+  git clone <https://github.com/Hujaifa81/library-management-api>
   ```
 
 ---
